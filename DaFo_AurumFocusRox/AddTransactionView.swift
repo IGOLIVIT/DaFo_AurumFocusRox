@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct AddTransactionView: View {
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     @Environment(\.dismiss) private var dismiss
     
     @State private var amount: String = ""
@@ -172,7 +172,7 @@ struct AddTransactionView: View {
             note: note.trimmingCharacters(in: .whitespacesAndNewlines)
         )
         
-        dataManager.addTransaction(transaction)
+        dataManagers.addTransaction(transaction)
         
         // Show success message
         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -216,14 +216,14 @@ struct CategoryChip: View {
 
 struct TaskRowView: View {
     let task: TaskItem
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     
     var body: some View {
         HStack(spacing: AurumTheme.smallPadding) {
             Button(action: {
                 var updatedTask = task
                 updatedTask.isDone = true
-                dataManager.updateTask(updatedTask)
+                dataManagers.updateTask(updatedTask)
                 
                 let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                 impactFeedback.impactOccurred()
@@ -266,5 +266,5 @@ struct TaskRowView: View {
 }
 
 #Preview {
-    AddTransactionView(dataManager: DataManager())
+    AddTransactionView(dataManagers: DataManagers())
 }

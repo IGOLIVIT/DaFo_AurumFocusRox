@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct AddTaskView: View {
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     @Environment(\.dismiss) private var dismiss
     
     @State private var title: String = ""
@@ -127,7 +127,7 @@ struct AddTaskView: View {
             isDone: false
         )
         
-        dataManager.addTask(task)
+        dataManagers.addTask(task)
         
         // Show success message
         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -146,7 +146,7 @@ struct AddTaskView: View {
 }
 
 struct EditTaskView: View {
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     @Environment(\.dismiss) private var dismiss
     
     let task: TaskItem
@@ -157,8 +157,8 @@ struct EditTaskView: View {
     @State private var priority: Priority
     @State private var showingSuccessMessage = false
     
-    init(dataManager: DataManager, task: TaskItem) {
-        self.dataManager = dataManager
+    init(dataManagers: DataManagers, task: TaskItem) {
+        self.dataManagers = dataManagers
         self.task = task
         self._title = State(initialValue: task.title)
         self._dueDate = State(initialValue: task.due ?? Date())
@@ -276,7 +276,7 @@ struct EditTaskView: View {
         updatedTask.due = hasDueDate ? dueDate : nil
         updatedTask.priority = priority
         
-        dataManager.updateTask(updatedTask)
+        dataManagers.updateTask(updatedTask)
         
         // Show success message
         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -295,5 +295,5 @@ struct EditTaskView: View {
 }
 
 #Preview {
-    AddTaskView(dataManager: DataManager())
+    AddTaskView(dataManagers: DataManagers())
 }

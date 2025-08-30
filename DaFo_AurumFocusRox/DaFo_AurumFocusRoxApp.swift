@@ -9,19 +9,19 @@ import SwiftUI
 
 @main
 struct AurumFocusApp: App {
-    @StateObject private var dataManager = DataManager()
+    @StateObject private var dataManagers = DataManagers()
     @AppStorage("onboardingCompleted") private var onboardingCompleted = false
     
     var body: some Scene {
         WindowGroup {
-            ContentView(dataManager: dataManager)
+            ContentView(dataManagers: dataManagers)
                 .onAppear {
                     // Sync onboarding state with data manager
-                    if dataManager.appState.onboardingCompleted != onboardingCompleted {
-                        onboardingCompleted = dataManager.appState.onboardingCompleted
+                    if dataManagers.appState.onboardingCompleted != onboardingCompleted {
+                        onboardingCompleted = dataManagers.appState.onboardingCompleted
                     }
                 }
-                .onChange(of: dataManager.appState.onboardingCompleted) { newValue in
+                .onChange(of: dataManagers.appState.onboardingCompleted) { newValue in
                     onboardingCompleted = newValue
                 }
         }

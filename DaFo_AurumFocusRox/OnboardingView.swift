@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct OnboardingView: View {
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     @State private var currentStep = 0
     @State private var animationOffset: CGFloat = 0
     
@@ -110,7 +110,7 @@ struct OnboardingView: View {
     }
     
     private func completeOnboarding() {
-        dataManager.completeOnboarding()
+        dataManagers.completeOnboarding()
     }
 }
 
@@ -160,5 +160,5 @@ struct OnboardingStepView: View {
 }
 
 #Preview {
-    OnboardingView(dataManager: DataManager())
+    OnboardingView(dataManagers: DataManagers())
 }

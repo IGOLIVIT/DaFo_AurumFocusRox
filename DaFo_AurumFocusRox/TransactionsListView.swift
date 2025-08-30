@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct TransactionsListView: View {
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     @Environment(\.dismiss) private var dismiss
     
     @State private var selectedFilter: TransactionFilter = .all
@@ -24,7 +24,7 @@ struct TransactionsListView: View {
         let calendar = Calendar.current
         let now = Date()
         
-        var transactions = dataManager.appState.transactions
+        var transactions = dataManagers.appState.transactions
         
         switch selectedFilter {
         case .all:
@@ -173,8 +173,8 @@ struct TransactionsListView: View {
     }
     
     private func deleteTransaction(_ transaction: Transaction) {
-        dataManager.appState.transactions.removeAll { $0.id == transaction.id }
-        dataManager.saveState()
+        dataManagers.appState.transactions.removeAll { $0.id == transaction.id }
+        dataManagers.saveState()
         
         // Haptic feedback
         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -353,5 +353,5 @@ struct TransactionRow: View {
 }
 
 #Preview {
-    TransactionsListView(dataManager: DataManager())
+    TransactionsListView(dataManagers: DataManagers())
 }

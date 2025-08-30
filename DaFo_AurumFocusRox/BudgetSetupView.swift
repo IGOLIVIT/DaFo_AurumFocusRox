@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct BudgetSetupView: View {
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     @Environment(\.dismiss) private var dismiss
     
     @State private var totalLimit: String = ""
@@ -25,7 +25,7 @@ struct BudgetSetupView: View {
         let month = calendar.component(.month, from: now)
         let year = calendar.component(.year, from: now)
         
-        return dataManager.appState.budgets.first { budget in
+        return dataManagers.appState.budgets.first { budget in
             budget.month == month && budget.year == year
         }
     }
@@ -257,7 +257,7 @@ struct BudgetSetupView: View {
             categories: categoryLimits
         )
         
-        dataManager.addBudget(budget)
+        dataManagers.addBudget(budget)
         
         // Show success message
         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -312,5 +312,5 @@ struct CategoryLimitRow: View {
 }
 
 #Preview {
-    BudgetSetupView(dataManager: DataManager())
+    BudgetSetupView(dataManagers: DataManagers())
 }

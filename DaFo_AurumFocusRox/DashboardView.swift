@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct DashboardView: View {
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     @Binding var selectedTab: Int
     @State private var showingAddTransaction = false
     @State private var showingBudgetSetup = false
@@ -16,7 +16,7 @@ struct DashboardView: View {
     private var currentMonthTransactions: [Transaction] {
         let calendar = Calendar.current
         let now = Date()
-        return dataManager.appState.transactions.filter { transaction in
+        return dataManagers.appState.transactions.filter { transaction in
             calendar.isDate(transaction.date, equalTo: now, toGranularity: .month)
         }
     }
@@ -39,7 +39,7 @@ struct DashboardView: View {
         let month = calendar.component(.month, from: now)
         let year = calendar.component(.year, from: now)
         
-        return dataManager.appState.budgets.first { budget in
+        return dataManagers.appState.budgets.first { budget in
             budget.month == month && budget.year == year
         }
     }
@@ -70,7 +70,7 @@ struct DashboardView: View {
     private var todaysTasks: [TaskItem] {
         let calendar = Calendar.current
         let today = Date()
-        return dataManager.appState.tasks
+        return dataManagers.appState.tasks
             .filter { !$0.isDone }
             .filter { task in
                 guard let due = task.due else { return false }
@@ -92,10 +92,10 @@ struct DashboardView: View {
     private var weeklyHabitsProgress: Double {
         let today = Date()
         
-        let totalTargets = dataManager.appState.habits.reduce(0) { $0 + $1.targetPerWeek }
+        let totalTargets = dataManagers.appState.habits.reduce(0) { $0 + $1.targetPerWeek }
         guard totalTargets > 0 else { return 0 }
         
-        let totalCompleted = dataManager.appState.habits.reduce(0) { sum, habit in
+        let totalCompleted = dataManagers.appState.habits.reduce(0) { sum, habit in
             let weekLogs = habit.logsForWeek(today)
             return sum + min(weekLogs.count, habit.targetPerWeek)
         }
@@ -170,18 +170,18 @@ struct DashboardView: View {
             }
         }
         .sheet(isPresented: $showingAddTransaction) {
-            AddTransactionView(dataManager: dataManager)
+            AddTransactionView(dataManagers: dataManagers)
         }
         .sheet(isPresented: $showingBudgetSetup) {
-            BudgetSetupView(dataManager: dataManager)
+            BudgetSetupView(dataManagers: dataManagers)
         }
         .sheet(isPresented: $showingTransactionsList) {
-            TransactionsListView(dataManager: dataManager)
+            TransactionsListView(dataManagers: dataManagers)
         }
         .alert("Reset All Data", isPresented: $showingResetAlert) {
             Button("Cancel", role: .cancel) { }
             Button("Reset", role: .destructive) {
-                dataManager.resetAllData()
+                dataManagers.resetAllData()
             }
         } message: {
             Text("This will permanently delete all your transactions, budgets, tasks, habits, and game progress. The app will return to its initial state and show the onboarding screen again.\n\nThis action cannot be undone.")
@@ -346,7 +346,7 @@ struct DashboardView: View {
             } else {
                 VStack(spacing: AurumTheme.smallPadding) {
                     ForEach(todaysTasks, id: \.id) { task in
-                        TaskRowView(task: task, dataManager: dataManager)
+                        TaskRowView(task: task, dataManagers: dataManagers)
                     }
                 }
             }
@@ -362,7 +362,7 @@ struct DashboardView: View {
                     .font(.aurumCaption)
                     .foregroundColor(AurumTheme.secondaryText)
                 
-                if dataManager.appState.habits.isEmpty {
+                if dataManagers.appState.habits.isEmpty {
                     Text("No habits yet")
                         .font(.aurumSubheadline)
                         .foregroundColor(AurumTheme.secondaryText)
@@ -375,7 +375,7 @@ struct DashboardView: View {
             
             Spacer()
             
-            if dataManager.appState.habits.isEmpty {
+            if dataManagers.appState.habits.isEmpty {
                 Button(action: {
                     // Navigate to Habits tab
                     selectedTab = 2
@@ -403,7 +403,7 @@ struct DashboardView: View {
                     .font(.aurumHeadline)
                     .foregroundColor(AurumTheme.primaryText)
                 
-                IncomeExpenseChartView(transactions: dataManager.appState.transactions)
+                IncomeExpenseChartView(transactions: dataManagers.appState.transactions)
                     .frame(height: 200)
             }
             .padding(AurumTheme.padding)
@@ -425,5 +425,5 @@ struct DashboardView: View {
 }
 
 #Preview {
-    DashboardView(dataManager: DataManager(), selectedTab: .constant(0))
+    DashboardView(dataManagers: DataManagers(), selectedTab: .constant(0))
 }

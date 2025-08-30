@@ -6,26 +6,26 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     @State private var selectedTab = 0
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            DashboardView(dataManager: dataManager, selectedTab: $selectedTab)
+            DashboardView(dataManagers: dataManagers, selectedTab: $selectedTab)
                 .tabItem {
                     Image(systemName: "creditcard")
                     Text("Dashboard")
                 }
                 .tag(0)
             
-            PlannerView(dataManager: dataManager)
+            PlannerView(dataManagers: dataManagers)
                 .tabItem {
                     Image(systemName: "list.bullet.rectangle")
                     Text("Planner")
                 }
                 .tag(1)
             
-            HabitsView(dataManager: dataManager)
+            HabitsView(dataManagers: dataManagers)
                 .tabItem {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                     Text("Habits")
@@ -45,5 +45,5 @@ struct MainTabView: View {
 }
 
 #Preview {
-    MainTabView(dataManager: DataManager())
+    MainTabView(dataManagers: DataManagers())
 }

@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct HabitsView: View {
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     @State private var showingAddHabit = false
     @State private var habitToDelete: Habit?
     @State private var showingDeleteAlert = false
@@ -18,10 +18,10 @@ struct HabitsView: View {
                 
                 ScrollView {
                     LazyVStack(spacing: AurumTheme.padding) {
-                        ForEach(dataManager.appState.habits, id: \.id) { habit in
+                        ForEach(dataManagers.appState.habits, id: \.id) { habit in
                             HabitCardView(
                                 habit: habit,
-                                dataManager: dataManager,
+                                dataManagers: dataManagers,
                                 onDelete: {
                                     habitToDelete = habit
                                     showingDeleteAlert = true
@@ -29,7 +29,7 @@ struct HabitsView: View {
                             )
                         }
                         
-                        if dataManager.appState.habits.isEmpty {
+                        if dataManagers.appState.habits.isEmpty {
                             EmptyHabitsView()
                         }
                     }
@@ -63,13 +63,13 @@ struct HabitsView: View {
             .preferredColorScheme(.dark)
         }
         .sheet(isPresented: $showingAddHabit) {
-            AddHabitView(dataManager: dataManager)
+            AddHabitView(dataManagers: dataManagers)
         }
         .alert("Delete Habit", isPresented: $showingDeleteAlert) {
             Button("Cancel", role: .cancel) { }
             Button("Delete", role: .destructive) {
                 if let habit = habitToDelete {
-                    dataManager.deleteHabit(habit)
+                    dataManagers.deleteHabit(habit)
                     habitToDelete = nil
                 }
             }
@@ -81,7 +81,7 @@ struct HabitsView: View {
 
 struct HabitCardView: View {
     let habit: Habit
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     let onDelete: () -> Void
     
     private var weeklyProgress: (completed: Int, target: Int) {
@@ -176,7 +176,7 @@ struct HabitCardView: View {
     private func toggleTodaysLog() {
         var updatedHabit = habit
         updatedHabit.toggleLogForDate(Date())
-        dataManager.updateHabit(updatedHabit)
+        dataManagers.updateHabit(updatedHabit)
         
         let impactFeedback = UIImpactFeedbackGenerator(style: .light)
         impactFeedback.impactOccurred()
@@ -294,7 +294,7 @@ struct EmptyHabitsView: View {
 }
 
 struct AddHabitView: View {
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     @Environment(\.dismiss) private var dismiss
     
     @State private var title: String = ""
@@ -396,7 +396,7 @@ struct AddHabitView: View {
             logs: []
         )
         
-        dataManager.addHabit(habit)
+        dataManagers.addHabit(habit)
         
         // Show success message
         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -415,5 +415,5 @@ struct AddHabitView: View {
 }
 
 #Preview {
-    HabitsView(dataManager: DataManager())
+    HabitsView(dataManagers: DataManagers())
 }

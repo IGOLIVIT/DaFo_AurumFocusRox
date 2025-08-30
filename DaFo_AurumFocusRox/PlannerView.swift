@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct PlannerView: View {
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     @State private var showingAddTask = false
     @State private var taskToEdit: TaskItem?
     @State private var taskToDelete: TaskItem?
@@ -16,7 +16,7 @@ struct PlannerView: View {
         let calendar = Calendar.current
         let today = Date()
         
-        return dataManager.appState.tasks
+        return dataManagers.appState.tasks
             .filter { !$0.isDone }
             .filter { task in
                 guard let due = task.due else { return false }
@@ -29,7 +29,7 @@ struct PlannerView: View {
         let calendar = Calendar.current
         let today = Date()
         
-        return dataManager.appState.tasks
+        return dataManagers.appState.tasks
             .filter { !$0.isDone }
             .filter { task in
                 guard let due = task.due else { return true } // Tasks without due date go to upcoming
@@ -39,7 +39,7 @@ struct PlannerView: View {
     }
     
     private var doneTasks: [TaskItem] {
-        return dataManager.appState.tasks
+        return dataManagers.appState.tasks
             .filter { $0.isDone }
             .sorted(by: taskSortComparator)
     }
@@ -89,7 +89,7 @@ struct PlannerView: View {
                         TaskSectionView(
                             title: "Today",
                             tasks: todayTasks,
-                            dataManager: dataManager,
+                            dataManagers: dataManagers,
                             onEdit: { task in taskToEdit = task },
                             onDelete: { task in
                                 taskToDelete = task
@@ -101,7 +101,7 @@ struct PlannerView: View {
                         TaskSectionView(
                             title: "Upcoming",
                             tasks: upcomingTasks,
-                            dataManager: dataManager,
+                            dataManagers: dataManagers,
                             onEdit: { task in taskToEdit = task },
                             onDelete: { task in
                                 taskToDelete = task
@@ -113,7 +113,7 @@ struct PlannerView: View {
                         TaskSectionView(
                             title: "Done",
                             tasks: doneTasks,
-                            dataManager: dataManager,
+                            dataManagers: dataManagers,
                             onEdit: { task in taskToEdit = task },
                             onDelete: { task in
                                 taskToDelete = task
@@ -151,16 +151,16 @@ struct PlannerView: View {
             .preferredColorScheme(.dark)
         }
         .sheet(isPresented: $showingAddTask) {
-            AddTaskView(dataManager: dataManager)
+            AddTaskView(dataManagers: dataManagers)
         }
         .sheet(item: $taskToEdit) { task in
-            EditTaskView(dataManager: dataManager, task: task)
+            EditTaskView(dataManagers: dataManagers, task: task)
         }
         .alert("Delete Task", isPresented: $showingDeleteAlert) {
             Button("Cancel", role: .cancel) { }
             Button("Delete", role: .destructive) {
                 if let task = taskToDelete {
-                    dataManager.deleteTask(task)
+                    dataManagers.deleteTask(task)
                     taskToDelete = nil
                 }
             }
@@ -173,7 +173,7 @@ struct PlannerView: View {
 struct TaskSectionView: View {
     let title: String
     let tasks: [TaskItem]
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     let onEdit: (TaskItem) -> Void
     let onDelete: (TaskItem) -> Void
     
@@ -206,7 +206,7 @@ struct TaskSectionView: View {
                     ForEach(tasks, id: \.id) { task in
                         TaskItemView(
                             task: task,
-                            dataManager: dataManager,
+                            dataManagers: dataManagers,
                             onEdit: { onEdit(task) },
                             onDelete: { onDelete(task) }
                         )
@@ -230,7 +230,7 @@ struct TaskSectionView: View {
 
 struct TaskItemView: View {
     let task: TaskItem
-    @ObservedObject var dataManager: DataManager
+    @ObservedObject var dataManagers: DataManagers
     let onEdit: () -> Void
     let onDelete: () -> Void
     
@@ -240,7 +240,7 @@ struct TaskItemView: View {
             Button(action: {
                 var updatedTask = task
                 updatedTask.isDone.toggle()
-                dataManager.updateTask(updatedTask)
+                dataManagers.updateTask(updatedTask)
                 
                 let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                 impactFeedback.impactOccurred()
@@ -306,7 +306,7 @@ struct TaskItemView: View {
             Button(task.isDone ? "Undo" : "Complete") {
                 var updatedTask = task
                 updatedTask.isDone.toggle()
-                dataManager.updateTask(updatedTask)
+                dataManagers.updateTask(updatedTask)
                 
                 let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                 impactFeedback.impactOccurred()
@@ -340,5 +340,5 @@ struct TaskItemView: View {
 }
 
 #Preview {
-    PlannerView(dataManager: DataManager())
+    PlannerView(dataManagers: DataManagers())
 }

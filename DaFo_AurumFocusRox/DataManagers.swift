@@ -1,12 +1,14 @@
 //
-//  DataManager.swift
-//  AurumFocus
+//  DataManagers.swift
+//  DaFo_AurumFocusRox
+//
+//  Created by IGOR on 30/08/2025.
 //
 
 import Foundation
 import Combine
 
-class DataManager: ObservableObject {
+class DataManagers: ObservableObject {
     @Published var appState = AppState()
     
     private let fileName = "appstate.json"
@@ -168,19 +170,19 @@ class DataManager: ObservableObject {
     private func hasOldTestData() -> Bool {
         // Check for specific test data patterns that indicate old seeded data
         let hasTestTransactions = appState.transactions.contains { transaction in
-            transaction.note.contains("Monthly salary") || 
+            transaction.note.contains("Monthly salary") ||
             transaction.note.contains("Freelance design") ||
             transaction.note.contains("Supermarket weekly run")
         }
         
         let hasTestHabits = appState.habits.contains { habit in
-            habit.title == "No sugar" || 
-            habit.title == "10k steps" || 
+            habit.title == "No sugar" ||
+            habit.title == "10k steps" ||
             habit.title == "Focused work 25m"
         }
         
         let hasTestTasks = appState.tasks.contains { task in
-            task.title == "Grocery restock" || 
+            task.title == "Grocery restock" ||
             task.title == "Pay electricity bill" ||
             task.title == "Refill metro card"
         }
